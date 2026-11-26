@@ -2,6 +2,11 @@
 
 Клиент игры-алхимии: смешивай два материала и открывай новые. Вся логика крафта и рецепты живут на бэкенде, фронтенд только вызывает REST API.
 
+**Прототип:** https://alchemy-forge-frontend-nu.vercel.app/
+**API:** https://alchemy-forge-backend.onrender.com ([health](https://alchemy-forge-backend.onrender.com/health)) · код бэкенда: https://github.com/Lyrismet/alchemy-forge-backend
+
+> Бэкенд на бесплатном Render засыпает после простоя: первый запрос может идти 30–60 секунд, интерфейс в это время показывает «Сервер просыпается…».
+
 - Стек: React 19 + Vite + TypeScript, без UI-библиотек.
 - Дизайн: UI-концепт «тёмный горн» (палитра, шрифты Philosopher + Inter, иконки материалов, состояния зоны крафта).
 - Бэкенд: отдельный репозиторий (Node.js + Express + PostgreSQL).
