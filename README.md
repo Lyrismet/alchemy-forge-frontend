@@ -10,7 +10,7 @@
 - Стек: React 19 + Vite + TypeScript, без UI-библиотек.
 - Дизайн: UI-концепт «тёмный горн» (палитра, шрифты Philosopher + Inter, иконки материалов, состояния зоны крафта).
 - Бэкенд: отдельный репозиторий (Node.js + Express + PostgreSQL).
-- Спецификация: [SPEC.md](SPEC.md), правила работы AI: [CLAUDE.md](CLAUDE.md), исходный промпт: [docs/INITIAL_PROMPT.md](docs/INITIAL_PROMPT.md), лог расхода токенов: [tokens/TOKEN_LOG.md](tokens/TOKEN_LOG.md) (скрипт `tokens/token_usage.py`).
+- Спецификация: [SPEC.md](SPEC.md), правила работы AI: [CLAUDE.md](CLAUDE.md), исходный промпт: [docs/INITIAL_PROMPT.md](docs/INITIAL_PROMPT.md), лог расхода токенов: [tokens/TOKEN_LOG.md](tokens/TOKEN_LOG.md), по всему проекту: [tokens/PROJECT_USAGE.md](tokens/PROJECT_USAGE.md) (скрипт `tokens/token_usage.py`).
 
 ## Возможности
 
