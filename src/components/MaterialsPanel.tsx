@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import type { Material } from '../api';
+import { TIER_NAMES, pips } from '../tiers';
 import { MaterialCard } from './MaterialCard';
+import { Icon } from './Icon';
 
 interface Props {
   materials: Material[];
@@ -9,7 +11,7 @@ interface Props {
 
 export function MaterialsPanel({ materials, onPick }: Props) {
   const [query, setQuery] = useState('');
-  const [tier, setTier] = useState<number | 0>(0);
+  const [tier, setTier] = useState(0);
 
   const tiers = useMemo(() => [...new Set(materials.map((m) => m.tier))].sort(), [materials]);
   const visible = materials.filter(
@@ -18,22 +20,25 @@ export function MaterialsPanel({ materials, onPick }: Props) {
 
   return (
     <section className="panel">
-      <h2>Материалы</h2>
-      <div className="filters">
-        <input placeholder="Поиск…" value={query} onChange={(e) => setQuery(e.target.value)} />
-        <select value={tier} onChange={(e) => setTier(Number(e.target.value))}>
-          <option value={0}>Все тиры</option>
-          {tiers.map((t) => (
-            <option key={t} value={t}>
-              Тир {t}
-            </option>
-          ))}
-        </select>
+      <div className="panel-head">
+        <h2>Материалы</h2>
+        <span className="muted">{visible.length} шт.</span>
+      </div>
+      <label className="search">
+        <Icon glyph="search" size={20} />
+        <input placeholder="Поиск по названию" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Поиск по названию" />
+      </label>
+      <div className="chips">
+        {[0, ...tiers].map((t) => (
+          <button key={t} className={`chip${tier === t ? ' is-active' : ''}`} data-tier={t || undefined} onClick={() => setTier(t)}>
+            {t ? `${pips(t)} ${TIER_NAMES[t] ?? t}` : 'Все'}
+          </button>
+        ))}
       </div>
       {visible.length === 0 ? (
-        <p className="muted">Ничего не найдено</p>
+        <p className="empty">Ничего не найдено</p>
       ) : (
-        <div className="grid">
+        <div className="tiles">
           {visible.map((m) => (
             <MaterialCard key={m.id} material={m} onClick={() => onPick(m)} />
           ))}

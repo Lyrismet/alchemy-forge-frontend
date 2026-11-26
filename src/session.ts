@@ -13,6 +13,7 @@ export interface JournalEntry {
   a: string;
   b: string;
   result: string;
+  slug?: string;
   at: number;
 }
 

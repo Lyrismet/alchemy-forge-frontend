@@ -16,7 +16,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [slots, setSlots] = useState<(Material | null)[]>([null, null]);
   const [crafting, setCrafting] = useState(false);
-  const [result, setResult] = useState<CraftResult | null>(null);
+  const [result, setResult] = useState<{ res: CraftResult; formula: string; key: number } | null>(null);
   const [journal, setJournal] = useState<JournalEntry[]>(() => loadJournal(sessionId));
 
   const load = useCallback(async () => {
@@ -42,10 +42,8 @@ export default function App() {
     load();
   }, [load]);
 
-  const available = useMemo(() => {
-    const ids = new Set(discoveredIds);
-    return all.filter((m) => m.isStarter || ids.has(m.id));
-  }, [all, discoveredIds]);
+  const discovered = useMemo(() => new Set(discoveredIds), [discoveredIds]);
+  const available = useMemo(() => all.filter((m) => m.isStarter || discovered.has(m.id)), [all, discovered]);
 
   const putInSlot = (m: Material, slot?: number) => {
     setResult(null);
@@ -64,12 +62,12 @@ export default function App() {
     setError(null);
     try {
       const r = await api.craft(sessionId, a.id, b.id);
-      setResult(r);
+      setResult({ res: r, formula: `${a.name} + ${b.name}${r.matched ? ` → ${r.resultMaterial.name}` : ''}`, key: Date.now() });
       setStatus('online');
       if (r.matched && r.isNewDiscovery) {
         setDiscoveredIds((ids) => [...ids, r.resultMaterial.id]);
         setAll((list) => (list.some((m) => m.id === r.resultMaterial.id) ? list : [...list, r.resultMaterial]));
-        const next = [{ a: a.name, b: b.name, result: r.resultMaterial.name, at: Date.now() }, ...journal];
+        const next = [{ a: a.name, b: b.name, result: r.resultMaterial.name, slug: r.resultMaterial.slug, at: Date.now() }, ...journal];
         setJournal(next);
         saveJournal(sessionId, next);
       }
@@ -99,22 +97,24 @@ export default function App() {
   };
 
   return (
-    <div className="app">
+    <div>
       <Header discovered={available.length} total={all.length} status={status} onReset={reset} busy={crafting || isLoading} />
 
       {error && (
-        <div className="error">
-          {error}
-          <button onClick={load}>Повторить</button>
+        <div className="error" role="alert">
+          <span>{error}</span>
+          <button className="btn" onClick={load}>Повторить</button>
         </div>
       )}
 
       {isLoading ? (
-        <p className="loading">
-          {status === 'waking' ? 'Сервер просыпается после простоя, это может занять до минуты…' : 'Загрузка…'}
-        </p>
+        <div className="loading">
+          <div className="ring" />
+          <b>{status === 'waking' ? 'Сервер просыпается после простоя' : 'Разжигаем горн…'}</b>
+          {status === 'waking' && <span className="muted">Бесплатный сервер стартует до минуты, подождите</span>}
+        </div>
       ) : (
-        <main className="layout">
+        <main className="main">
           <MaterialsPanel materials={available} onPick={(m) => putInSlot(m)} />
           <CraftZone
             slots={slots}
@@ -131,7 +131,7 @@ export default function App() {
             crafting={crafting}
             result={result}
           />
-          <Journal entries={journal} />
+          <Journal entries={journal} all={all} discovered={discovered} />
         </main>
       )}
     </div>

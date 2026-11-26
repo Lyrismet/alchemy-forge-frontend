@@ -1,22 +1,30 @@
 import type { Material } from '../api';
+import { TIER_NAMES } from '../tiers';
+import { Icon, glyphFor } from './Icon';
 
 interface Props {
   material: Material;
   onClick?: () => void;
-  highlight?: boolean;
 }
 
-export function MaterialCard({ material, onClick, highlight }: Props) {
+export function MaterialCard({ material, onClick }: Props) {
+  const t = material.tier;
   return (
     <button
-      className={`card tier-${material.tier}${highlight ? ' card-new' : ''}`}
+      className="tile"
+      data-tier={t}
       onClick={onClick}
-      draggable={!!onClick}
+      draggable
       onDragStart={(e) => e.dataTransfer.setData('text/plain', String(material.id))}
-      title={material.name}
+      aria-label={`${material.name}, ${TIER_NAMES[t] ?? `тир ${t}`}`}
     >
-      <span className="card-name">{material.name}</span>
-      <span className="badge">T{material.tier}</span>
+      <span className="pips" aria-hidden="true">
+        {Array.from({ length: Math.max(3, t) }, (_, i) => (
+          <i key={i} className={i < t ? 'on' : ''} />
+        ))}
+      </span>
+      <Icon glyph={glyphFor(material.slug)} size={48} />
+      <span className="tile-name">{material.name}</span>
     </button>
   );
 }
